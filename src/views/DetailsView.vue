@@ -6,8 +6,8 @@
         <div class="details-wrapper">
           <h2 class="details-title">{{movieDetails.title}}</h2>
           <div class="details-year__wrapper">
-            <p class="details-year"><span>{{movieDetails.year}}</span> year</p>
-            <p class="details-year"><span>{{movieDetails.runtime}}</span> min</p>
+            <p class="details-year"><span class="number">{{movieDetails.year}}</span> year</p>
+            <div v-html="getDuration"></div>
           </div>
           <p class="details-description">{{movieDetails.plot}}</p>
         </div>
@@ -63,11 +63,14 @@ export default defineComponent({
   computed: {
     getCurrentGenre (): string {
       return this.movieDetails.genres[0]
+    },
+    getDuration (): string {
+      return `<p class="details-year"><span class="number">${this.movieDetails.runtime}</span> min</p>`
     }
   }
 })
 </script>
-<style scoped>
+<style>
 .details-section{
   padding: 70px 0;
   position: relative;
@@ -122,7 +125,7 @@ export default defineComponent({
   margin-right: 30px;
   
 }
-.details-year span{
+.details-year .number {
   font-size: 28px;
   color: #f65261;
   font-weight: normal;

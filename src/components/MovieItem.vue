@@ -1,6 +1,8 @@
 <template>
   <div class="movie-item">
-    <img class="movie-poster" @click="openDetails" :src="movie.posterUrl" alt="" @error="handleImgError">
+    <figure @click="openDetails" v-lazyload class="movie-poster__wrapper">
+      <img class="movie-poster" :data-url="movie.posterUrl" :alt="`${movie.title} poster`">
+    </figure>
     <div class="movie-info">
       <h6 class="movie-title">{{movie.title}}</h6>
       <span class="movie-year">{{movie.year}}</span>
@@ -16,25 +18,18 @@ import { MovieObject, NOT_FOUND_IMAGE } from '../helpers'
 export default defineComponent({
   name: 'movie-item',
   props: {
-    movie: {
-      type: Object as PropType<MovieObject>,
-      required: true
-    }
+    movie: Object as PropType<MovieObject>
   },
+
   computed: {
     getGenres () {
-      return this.movie.genres.join(', ')
+      return this.movie?.genres.join(', ')
     }
   },
   methods: {
-    handleImgError (event: any) {
-      if (event && event.target && event.target.src) {
-        event.target.src = NOT_FOUND_IMAGE
-      }
-    },
     openDetails () {
       window.scrollTo({ top: 0 })
-      this.$router.push(`/details/${this.movie.id}`)
+      this.$router.push(`/details/${this.movie?.id}`)
     }
   }
 })
@@ -79,9 +74,13 @@ button {
   margin-bottom: 30px;
 }
 .movie-poster{
-  height: 455px;
+  height: 100%;
+  max-height: 455px;
   width: 100%;
   object-fit: cover;
   cursor: pointer;
+}
+.movie-poster__wrapper{
+  height: 455px;
 }
 </style>
