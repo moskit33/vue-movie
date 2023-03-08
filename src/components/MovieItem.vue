@@ -13,7 +13,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { MovieObject, NOT_FOUND_IMAGE } from '../helpers'
+import { mapMutations } from 'vuex'
+import { MovieObject } from '../helpers'
 
 export default defineComponent({
   name: 'movie-item',
@@ -27,8 +28,12 @@ export default defineComponent({
     }
   },
   methods: {
+    ...mapMutations({
+      setCurrentMovieId: 'setCurrentMovieId'
+    }),
     openDetails () {
       window.scrollTo({ top: 0 })
+      this.setCurrentMovieId(this.movie?.id)
       this.$router.push(`/details/${this.movie?.id}`)
     }
   }

@@ -1,15 +1,15 @@
 <template>
-  <div v-if="movieDetails">
+  <div v-if="currentMovieDetails">
     <div class="details-section">
       <div class="details-container">
-        <img class="details-img" :src="movieDetails.posterUrl" @error="handleImgError" />
+        <img class="details-img" :src="currentMovieDetails.posterUrl" @error="handleImgError" />
         <div class="details-wrapper">
-          <h2 class="details-title">{{movieDetails.title}}</h2>
+          <h2 class="details-title">{{currentMovieDetails.title}}</h2>
           <div class="details-year__wrapper">
-            <p class="details-year"><span class="number">{{movieDetails.year}}</span> year</p>
+            <p class="details-year"><span class="number">{{currentMovieDetails.year}}</span> year</p>
             <div v-html="getDuration"></div>
           </div>
-          <p class="details-description">{{movieDetails.plot}}</p>
+          <p class="details-description">{{currentMovieDetails.plot}}</p>
         </div>
       </div>
       <RouterLink class="linkToSearch" to="/"><img src="../assets/zoom-icon-svgrepo-com.svg"/></RouterLink>
@@ -19,53 +19,59 @@
         <span class="sorting-found">Films by {{getCurrentGenre}} genre</span>
       </div>
     </div>
-    <MovieList :movieList="getMoviesByGenre()" />
+    <MovieList :movieList="getMoviesByGenre" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import MovieList from '../components/MovieList.vue'
-import movieDB from '../assets/db.json'
-import { MovieObject, NOT_FOUND_IMAGE } from '../helpers'
+import { NOT_FOUND_IMAGE } from '../helpers'
+import { mapGetters, mapMutations, mapState } from 'vuex'
 
 export default defineComponent({
   name: 'HomeView',
   components: { MovieList },
-  data: function (): { movieList: MovieObject[], movieDetails: MovieObject} {
+  data: function () {
     return {
-      movieList: movieDB.movies,
-      movieDetails: {} as MovieObject
     }
   },
   created: function () {
-    this.setMovieDetails()
+    this.setMovieId()
   },
   updated: function () {
-    this.setMovieDetails()
+    this.setMovieId()
   },
   methods: {
+    ...mapMutations({
+      setCurrentMovieId: 'setCurrentMovieId'
+    }),
     handleImgError (event: any) {
       if (event && event.target && event.target.src) {
         event.target.src = NOT_FOUND_IMAGE
       }
     },
-    getMoviesByGenre () {
-      return this.movieList.filter((el) => el.genres.some((genre) => genre === this.getCurrentGenre)).filter((el) => el.id !== this.movieDetails.id)
-    },
-    setMovieDetails () {
+    setMovieId () {
       const movieId = this.$route.params.id
       console.log('movieId', movieId);
-      
-      this.movieDetails = this.movieList.find((el: MovieObject) => +el.id === +movieId)! as MovieObject
+      if(+movieId !== this.currentMovieId) {
+        this.setCurrentMovieId(movieId)
+      }
     }
   },
   computed: {
+    ...mapState({
+      currentMovieId: (state: any) => state.currentMovieId,
+    }),
+    ...mapGetters({
+      currentMovieDetails: 'currentMovieDetails',
+      getMoviesByGenre: 'getMoviesByGenre'
+    }),
     getCurrentGenre (): string {
-      return this.movieDetails.genres[0]
+      return this.currentMovieDetails.genres[0]
     },
     getDuration (): string {
-      return `<p class="details-year"><span class="number">${this.movieDetails.runtime}</span> min</p>`
+      return `<p class="details-year"><span class="number">${this.currentMovieDetails.runtime}</span> min</p>`
     }
   }
 })
