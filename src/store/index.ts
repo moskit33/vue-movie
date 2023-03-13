@@ -9,6 +9,7 @@ export default createStore({
     currentMovieId: '',
     movieList: movieDB.movies,
     searchedMovieList: movieDB.movies
+
   },
   getters: {
     currentMovieDetails: (state) => {
