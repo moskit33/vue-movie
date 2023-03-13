@@ -30,7 +30,7 @@ import { NOT_FOUND_IMAGE } from '../helpers'
 import { mapGetters, mapMutations, mapState } from 'vuex'
 
 export default defineComponent({
-  name: 'HomeView',
+  name: 'DetailsView',
   components: { MovieList },
   data: function () {
     return {
