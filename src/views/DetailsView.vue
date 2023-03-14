@@ -1,77 +1,78 @@
 <template>
-  <div v-if="currentMovieDetails">
+  <div v-if="isLoading" class="loader">
+    <img src="../assets/loader.gif" alt="loader">
+  </div>
+  <div v-else-if="currentMovieDetails">
     <div class="details-section">
       <div class="details-container">
-        <img class="details-img" :src="currentMovieDetails.posterUrl" @error="handleImgError" />
+        <img class="details-img" :src="currentMovieDetails.posterurl" @error="handleImgError" />
         <div class="details-wrapper">
           <h2 class="details-title">{{currentMovieDetails.title}}</h2>
           <div class="details-year__wrapper">
             <p class="details-year"><span class="number">{{currentMovieDetails.year}}</span> year</p>
             <div v-html="getDuration"></div>
           </div>
-          <p class="details-description">{{currentMovieDetails.plot}}</p>
+          <p class="details-description">{{currentMovieDetails.storyline}}</p>
         </div>
       </div>
       <RouterLink class="linkToSearch" to="/"><img src="../assets/zoom-icon-svgrepo-com.svg"/></RouterLink>
     </div>
-    <div v-if="getCurrentGenre" class="sorting-wrap">
+    <div class="sorting-wrap">
       <div class="sorting">
         <span class="sorting-found">Films by {{getCurrentGenre}} genre</span>
       </div>
     </div>
-    <MovieList :movieList="getMoviesByGenre" />
+    <MovieList :movieList="movieListByGenre" />
   </div>
+  <div v-else class="not-found-movie">MOVIE NOT FOUND :(</div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import MovieList from '../components/MovieList.vue'
 import { NOT_FOUND_IMAGE } from '../helpers'
-import { mapGetters, mapMutations, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default defineComponent({
   name: 'DetailsView',
   components: { MovieList },
   data: function () {
     return {
+      movieId: this.$route.params.id
     }
   },
   created: function () {
-    this.setMovieId()
+    this.getMovieById(this.movieId)
   },
   updated: function () {
-    this.setMovieId()
+    let paramId = this.$route.params.id;
+    if (this.movieId !== paramId) {
+      this.getMovieById(paramId)
+      this.movieId = paramId
+    }
   },
   methods: {
-    ...mapMutations({
-      setCurrentMovieId: 'setCurrentMovieId'
+    ...mapActions({
+      getMovieById: 'getMovieById'
     }),
+
     handleImgError (event: any) {
       if (event && event.target && event.target.src) {
         event.target.src = NOT_FOUND_IMAGE
       }
     },
-    setMovieId () {
-      const movieId = this.$route.params.id
-      console.log('movieId', movieId);
-      if(+movieId !== this.currentMovieId) {
-        this.setCurrentMovieId(movieId)
-      }
-    }
   },
   computed: {
     ...mapState({
-      currentMovieId: (state: any) => state.currentMovieId,
-    }),
-    ...mapGetters({
-      currentMovieDetails: 'currentMovieDetails',
-      getMoviesByGenre: 'getMoviesByGenre'
+      isLoading: (state: any) => state.isLoading,
+      currentMovieDetails: (state: any) => state.currentMovieDetails,
+      movieListByGenre: (state: any) => state.movieListByGenre
     }),
     getCurrentGenre (): string {
-      return this.currentMovieDetails.genres[0]
+      return this.currentMovieDetails?.genres[0]
     },
     getDuration (): string {
-      return `<p class="details-year"><span class="number">${this.currentMovieDetails.runtime}</span> min</p>`
+      return `<p class="details-year"><span class="number">${this.currentMovieDetails.duration.slice(2,-1)}</span> min</p>`
     }
   }
 })
@@ -82,6 +83,22 @@ export default defineComponent({
   position: relative;
   background: url(../assets/bg.jpg);
 
+}
+.loader{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+}
+.loader img {
+  width: 100px;
+  height: 100px;
+}
+.not-found-movie{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .details-section::before{
   content: "";

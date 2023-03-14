@@ -1,7 +1,7 @@
 <template>
   <div class="movie-item">
     <figure @click="openDetails" v-lazyload class="movie-poster__wrapper">
-      <img class="movie-poster" :data-url="movie.posterUrl" :alt="`${movie.title} poster`">
+      <img class="movie-poster" :data-url="movie.posterurl" :alt="`${movie.title} poster`">
     </figure>
     <div class="movie-info">
       <h6 class="movie-title">{{movie.title}}</h6>
@@ -28,12 +28,8 @@ export default defineComponent({
     }
   },
   methods: {
-    ...mapMutations({
-      setCurrentMovieId: 'setCurrentMovieId'
-    }),
     openDetails () {
       window.scrollTo({ top: 0 })
-      this.setCurrentMovieId(this.movie?.id)
       this.$router.push(`/details/${this.movie?.id}`)
     }
   }

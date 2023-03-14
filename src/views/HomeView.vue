@@ -3,24 +3,27 @@
     <div class="search-section">
       <h1 class="search-title">FIND YOUR MOVIE</h1>
       <div class="search-wrapper">
-        <input type="text" :value="searchInput" @input="(event) => setSearchInput((event.target as any).value)" @keyup.enter="searchHandle">
-        <MovieButton @click="searchHandle" :is-search="true">SEARCH</MovieButton>
+        <input type="text" :value="searchInput" @input="(event) => setSearchInput((event.target as any).value)" @keyup.enter="getAllMovies">
+        <MovieButton @click="getAllMovies" :is-search="true">SEARCH</MovieButton>
       </div>
       <div class="searchBy">
         SEARCH BY
         <MovieButton @click="changeSearchBy('title')" :is-active="searchBy === 'title'">TITLE</MovieButton>
-        <MovieButton @click="changeSearchBy('genre')" :is-active="searchBy === 'genre'">GENRE</MovieButton>
+        <MovieButton @click="changeSearchBy('genres')" :is-active="searchBy === 'genres'">GENRE</MovieButton>
       </div>
     </div>
     <div class="sorting-wrap">
       <div class="sorting">
-        <span class="sorting-found">{{sortedAndSearchedMovies.length}} was found</span>
+        <span class="sorting-found">{{searchedMovieList.length}} was found</span>
         SORT BY
-        <MovieButton @click="setSortBy('date')" :is-active="sortBy === 'date'">Release Date</MovieButton>
-        <MovieButton @click="setSortBy('duration')" :is-active="sortBy === 'duration'">Duration</MovieButton>
+        <MovieButton @click="changeSortBy('year')" :is-active="sortBy === 'year'">Release Date</MovieButton>
+        <MovieButton @click="changeSortBy('duration')" :is-active="sortBy === 'duration'">Duration</MovieButton>
       </div>
     </div>
-    <MovieList :movieList="sortedAndSearchedMovies" />
+    <div v-if="isLoading" class="loader">
+      <img src="../assets/loader.gif" alt="loader">
+    </div>
+    <MovieList v-else :movieList="searchedMovieList" />
   </div>
 </template>
 
@@ -45,11 +48,15 @@ export default defineComponent({
       setSearchBy: 'setSearchBy'
     }),
     ...mapActions({
-      searchHandle: 'searchHandle'
+      getAllMovies: 'getAllMovies'
     }),
+    changeSortBy (value: string) {
+      this.setSortBy(value)
+      this.getAllMovies()
+    },
     changeSearchBy (value: string) {
       this.setSearchBy(value)
-      this.searchHandle()
+      this.getAllMovies()
     },
   },
   computed: {
@@ -57,10 +64,15 @@ export default defineComponent({
       searchInput: (state: any) => state.searchInput,
       sortBy: (state: any) => state.sortBy,
       searchBy: (state: any) => state.searchBy,
+      searchedMovieList: (state: any) => state.searchedMovieList,
+      isLoading: (state: any) => state.isLoading,
     }),
     ...mapGetters({
       sortedAndSearchedMovies: 'sortedAndSearchedMovies'
     })
+  },
+  created() {
+    this.getAllMovies()
   },
   components: { MovieList, MovieButton }
 })
@@ -81,6 +93,17 @@ li {
 }
 a {
   color: #42b983;
+}
+
+.loader {
+  height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loader img {
+  width: 100px;
+  height: 100px;
 }
 
 .sorting-wrap{

@@ -7,8 +7,8 @@ describe('Vuex store', () => {
     });
 
     it('setSearchBy mutation sets searchBy state', () => {
-        Store.commit('setSearchBy', 'genre');
-        expect(Store.state.searchBy).toBe('genre');
+        Store.commit('setSearchBy', 'genres');
+        expect(Store.state.searchBy).toBe('genres');
     });
 
     it('setSearchInput mutation sets searchInput state', () => {
@@ -22,8 +22,8 @@ describe('Vuex store', () => {
         expect(Store.state.searchedMovieList).toEqual(movies);
     });
 
-    it('setCurrentMovieId mutation sets currentMovieId state', () => {
-        Store.commit('setCurrentMovieId', '1');
-        expect(Store.state.currentMovieId).toBe('1');
+    it('setcurrentMovieDetails mutation sets currentMovieDetails state', () => {
+        Store.commit('currentMovieDetails', '1');
+        expect(Store.state.currentMovieDetails).toBe('1');
     });
 });

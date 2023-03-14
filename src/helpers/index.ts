@@ -3,10 +3,10 @@ export interface MovieObject {
   title: string,
   year: string,
   genres: string[],
-  posterUrl: string,
+  posterurl: string,
   director: string,
   actors: string,
-  plot: string
+  storyline: string
   runtime: string
 }
 

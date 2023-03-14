@@ -1,7 +1,10 @@
 <template>
   <div class="movie-list">
-    <div class="container">
+    <div v-if="movieList.length" class="container">
       <MovieItem v-for="movie in movieList" :movie="movie" :key="movie.id"  />
+    </div>
+    <div v-else class="not-found">
+      0 MOVIES WAS FOUND
     </div>
   </div>
 </template>
@@ -18,7 +21,6 @@ export default defineComponent({
       type: Array
     }
   },
-
   components: { MovieItem }
 })
 </script>
@@ -39,5 +41,12 @@ export default defineComponent({
   width: 100%;
   max-width: 1020px;
   margin: 0 auto;
+}
+
+.not-found{
+  font-size: 24px;
+  color: #fff;
+  height: 50vh;
+  line-height: 50vh;
 }
 </style>
