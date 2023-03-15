@@ -1,6 +1,10 @@
 <!-- eslint-disable no-tabs -->
 <template>
-  <router-view/>
+  <router-view 
+    :search-query="$route.query.q"
+    :search-by-param="$route.query.searchBy"
+    :sort-by-param="$route.query.sortBy"
+    />
 </template>
 
 <style lang="scss">

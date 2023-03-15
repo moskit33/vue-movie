@@ -26,11 +26,11 @@ export default createStore<State>({
   getters: {
   },
   mutations: {
-    setSortBy(state, value) {
-      state.sortBy = value
+    setSortBy(state, value = 'year') {
+      state.sortBy = value === 'duration' ? 'duration' : 'year'
     },
-    setSearchBy(state, value) {
-      state.searchBy = value
+    setSearchBy(state, value = 'title') {
+      state.searchBy = value === 'genres' ? 'genres' : 'title'
     },
     setSearchInput(state, value) {
       state.searchInput = value

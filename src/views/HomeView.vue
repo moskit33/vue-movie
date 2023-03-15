@@ -3,7 +3,7 @@
     <div class="search-section">
       <h1 class="search-title">FIND YOUR MOVIE</h1>
       <div class="search-wrapper">
-        <input type="text" :value="searchInput" @input="(event) => setSearchInput((event.target as any).value)" @keyup.enter="getAllMovies">
+        <input type="text" :value="searchInput" @input="(event) => handleSearchInput((event.target as any).value)" @keyup.enter="getAllMovies">
         <MovieButton @click="getAllMovies" :is-search="true">SEARCH</MovieButton>
       </div>
       <div class="searchBy">
@@ -36,7 +36,18 @@ import {mapState, mapGetters, mapActions, mapMutations} from 'vuex'
 export default defineComponent({
   name: 'HomeView',
   props: {
-    msg: String
+    searchQuery: {
+      type: String,
+      default: '',
+    },
+    searchByParam: {
+      type: String,
+      default: '',
+    },
+    sortByParam: {
+      type: String,
+      default: '',
+    }
   },
   data: function () {
     return {}
@@ -52,12 +63,18 @@ export default defineComponent({
     }),
     changeSortBy (value: string) {
       this.setSortBy(value)
+      this.$router.push({ query: { ...this.$route.query, sortBy: value } });
       this.getAllMovies()
     },
     changeSearchBy (value: string) {
       this.setSearchBy(value)
+      this.$router.push({ query: { ...this.$route.query, searchBy: value } });
       this.getAllMovies()
     },
+    handleSearchInput (value: string) {
+      this.setSearchInput(value)
+      this.$router.push({ query: { ...this.$route.query, q: value } });
+    }
   },
   computed: {
     ...mapState({
@@ -72,6 +89,10 @@ export default defineComponent({
     })
   },
   created() {
+    this.setSearchInput(this.searchQuery)
+    this.setSortBy(this.sortByParam)
+    this.setSearchBy(this.searchByParam)
+
     this.getAllMovies()
   },
   components: { MovieList, MovieButton }

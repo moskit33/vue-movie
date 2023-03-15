@@ -5,12 +5,19 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeView,
+    props: true
   },
   {
     path: '/details/:id',
     name: 'details',
     component: () => import('../views/DetailsView.vue')
+  }
+  ,
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'notFound',
+    component: () => import('../views/NotFound.vue')
   }
 ]
 
