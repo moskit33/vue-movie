@@ -42,11 +42,11 @@ export default defineComponent({
     },
     searchByParam: {
       type: String,
-      default: '',
+      default: 'title',
     },
     sortByParam: {
       type: String,
-      default: '',
+      default: 'year',
     }
   },
   data: function () {
