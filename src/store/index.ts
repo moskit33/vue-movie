@@ -2,7 +2,7 @@
 import { MovieObject } from '@/helpers'
 import { createStore } from 'vuex'
 import Api from '../api/Api'
-
+import router from '../router';
 export interface State {
   searchInput: string,
   sortBy: string,
@@ -60,10 +60,15 @@ export default createStore<State>({
     getMovieById({ state, commit }, id: string) {
       commit('setIsLoading', true)
       Api.fetchMovieById(id).then((movieDetails) => {
-        commit('setCurrentMovieDetails', movieDetails)
-        this.dispatch('getMovieByGenre', movieDetails.genres[0])
+        if (movieDetails) {
+          commit('setCurrentMovieDetails', movieDetails)
+          this.dispatch('getMovieByGenre', movieDetails.genres[0])
+        }
       })
-        .catch((error) => console.log(error))
+        .catch((error) => {
+          router.push('/notFound')
+          console.error("error", error);
+        })
         .finally(() => commit('setIsLoading', false))
     },
     getMovieByGenre({ state, commit }, genre: string) {

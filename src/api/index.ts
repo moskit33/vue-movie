@@ -10,5 +10,5 @@ export default function request(path: string, options: any = {}) {
         params
     })
         .then((response) => response.data)
-        .catch((error) => console.log(error))
+        .catch((error) => error)
 }

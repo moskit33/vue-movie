@@ -4,7 +4,7 @@
       <MovieItem v-for="movie in movieList" :movie="movie" :key="movie.id"  />
     </div>
     <div v-else class="not-found">
-      0 MOVIES WAS FOUND
+      No films found
     </div>
   </div>
 </template>
@@ -44,7 +44,7 @@ export default defineComponent({
 }
 
 .not-found{
-  font-size: 24px;
+  font-size: 50px;
   color: #fff;
   height: 50vh;
   line-height: 50vh;
