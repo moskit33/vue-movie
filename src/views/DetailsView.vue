@@ -28,51 +28,59 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, computed, onMounted, onUpdated, watch, ref } from 'vue'
 import MovieList from '../components/MovieList.vue'
 import { NOT_FOUND_IMAGE } from '../helpers'
-import { mapActions, mapState } from 'vuex'
+import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 
 export default defineComponent({
   name: 'DetailsView',
   components: { MovieList },
-  data: function () {
-    return {
-      movieId: this.$route.params.id
+  setup() {
+    const route = useRoute()
+    const store = useStore()
+    const isLoading = computed(() => store.state.isLoading)
+    const currentMovieDetails = computed(() => store.state.currentMovieDetails)
+    const movieListByGenre = computed(() => store.state.movieListByGenre)
+    const movieId = ref(route.params.id+'')
+    
+    const getMovieById = (id: string) => {
+      store.dispatch('getMovieById', id)
     }
-  },
-  created: function () {
-    this.getMovieById(this.movieId)
-  },
-  updated: function () {
-    let paramId = this.$route.params.id;
-    if (this.movieId !== paramId) {
-      this.getMovieById(paramId)
-      this.movieId = paramId
-    }
-  },
-  methods: {
-    ...mapActions({
-      getMovieById: 'getMovieById'
-    }),
 
-    handleImgError (event: any) {
+    const handleImgError = (event: any) => {
       if (event && event.target && event.target.src) {
         event.target.src = NOT_FOUND_IMAGE
       }
-    },
-  },
-  computed: {
-    ...mapState({
-      isLoading: (state: any) => state.isLoading,
-      currentMovieDetails: (state: any) => state.currentMovieDetails,
-      movieListByGenre: (state: any) => state.movieListByGenre
-    }),
-    getCurrentGenre (): string {
-      return this.currentMovieDetails?.genres[0]
-    },
-    getDuration (): string {
-      return `<p class="details-year"><span class="number">${this.currentMovieDetails.duration.slice(2,-1)}</span> min</p>`
+    }
+
+    const getCurrentGenre = computed(() => {
+      return currentMovieDetails.value?.genres[0]
+    })
+
+    const getDuration = computed(() => {
+      return `<p class="details-year"><span class="number">${currentMovieDetails.value.duration.slice(2,-1)}</span> min</p>`
+    })
+
+    onMounted(() => {
+      getMovieById(movieId.value)
+    })
+
+    watch(() => route.params.id, (newVal, oldVal) => {
+      if(newVal !== oldVal) {
+        movieId.value = newVal+''
+        getMovieById(movieId.value)
+      }
+    })
+
+    return {
+      isLoading,
+      currentMovieDetails,
+      movieListByGenre,
+      handleImgError,
+      getCurrentGenre,
+      getDuration
     }
   }
 })

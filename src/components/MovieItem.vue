@@ -1,20 +1,20 @@
 <template>
   <div class="movie-item">
     <figure @click="openDetails" v-lazyload class="movie-poster__wrapper">
-      <img class="movie-poster" :data-url="movie.posterurl" :alt="`${movie.title} poster`">
+      <img class="movie-poster" :data-url="moviePosterUrl" :alt="`${movieTitle} poster`">
     </figure>
     <div class="movie-info">
-      <h6 class="movie-title">{{movie.title}}</h6>
-      <span class="movie-year">{{movie.year}}</span>
+      <h6 class="movie-title">{{movieTitle}}</h6>
+      <span class="movie-year">{{movieYear}}</span>
     </div>
-    <p class="movie-gengre">{{getGenres}}</p>
+    <p class="movie-gengre">{{genres}}</p>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import { mapMutations } from 'vuex'
+import { defineComponent, PropType, computed } from 'vue'
 import { MovieObject } from '../helpers'
+import router from '@/router'
 
 export default defineComponent({
   name: 'movie-item',
@@ -22,19 +22,28 @@ export default defineComponent({
     movie: Object as PropType<MovieObject>
   },
 
-  computed: {
-    getGenres () {
-      return this.movie?.genres.join(', ')
+  setup(props) {
+    const movieTitle = computed(() => props.movie?.title)
+    const movieYear = computed(() => props.movie?.year)
+    const moviePosterUrl = computed(() => props.movie?.posterurl)
+    const genres = computed(() => props.movie?.genres.join(', '))
+
+    const openDetails = () => {
+      window.scrollTo({ top: 0 })
+      router.push(`/details/${props.movie?.id}`)
+    }
+
+    return {
+      movieTitle,
+      movieYear,
+      moviePosterUrl,
+      genres,
+      openDetails,
     }
   },
-  methods: {
-    openDetails () {
-      window.scrollTo({ top: 0 })
-      this.$router.push(`/details/${this.movie?.id}`)
-    }
-  }
 })
 </script>
+
 
 <style scoped>
 button {

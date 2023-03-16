@@ -139,13 +139,8 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-    name: 'NotFound',
-        data: function () {
-            return {
-            }
-        },
-
-    })
+  name: 'NotFound',
+})
 </script>
 <style lang="scss">
 $p: 12px;

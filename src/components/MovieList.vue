@@ -1,6 +1,6 @@
 <template>
   <div class="movie-list">
-    <div v-if="movieList.length" class="container">
+    <div v-if="moviesExist" class="container">
       <MovieItem v-for="movie in movieList" :movie="movie" :key="movie.id"  />
     </div>
     <div v-else class="not-found">
@@ -10,18 +10,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, computed } from 'vue'
 import MovieItem from '../components/MovieItem.vue'
+
 export default defineComponent({
   name: 'movie-list',
-  computed: {
-  },
   props: {
     movieList: {
-      type: Array
+      type: Array,
+      default: () => []
     }
   },
-  components: { MovieItem }
+  components: { MovieItem },
+
+  setup(props) {
+    const moviesExist = computed(() => props.movieList && props.movieList.length > 0)
+
+    return {
+      moviesExist
+    }
+  }
 })
 </script>
 
