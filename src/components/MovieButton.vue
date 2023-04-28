@@ -1,11 +1,11 @@
 <template>
-  <button class="button" :class="isSearch ? 'button--active button--search' : isActive ? 'button--active' : ''">
+  <button class="button" :class="buttonClasses">
     <slot></slot>
   </button>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, computed } from 'vue'
 
 export default defineComponent({
   name: 'movie-button',
@@ -19,9 +19,17 @@ export default defineComponent({
       default: false
     }
   },
-  computed: {
-  },
-  methods: {
+  setup(props) {
+    const buttonClasses = computed(() => {
+      return {
+        'button--active': props.isActive || props.isSearch,
+        'button--search': props.isSearch,
+      }
+    })
+    
+    return {
+      buttonClasses,
+    }
   }
 })
 </script>
