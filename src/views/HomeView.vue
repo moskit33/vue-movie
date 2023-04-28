@@ -3,70 +3,127 @@
     <div class="search-section">
       <h1 class="search-title">FIND YOUR MOVIE</h1>
       <div class="search-wrapper">
-        <input type="text" :value="searchInput" @input="(event) => setSearchInput((event.target as any).value)" @keyup.enter="searchHandle">
-        <MovieButton @click="searchHandle" :is-search="true">SEARCH</MovieButton>
+        <input v-model="formattedSearchInput" @keyup.enter="getAllMovies">
+        <MovieButton @click="getAllMovies" :is-search="true">SEARCH</MovieButton>
       </div>
       <div class="searchBy">
         SEARCH BY
         <MovieButton @click="changeSearchBy('title')" :is-active="searchBy === 'title'">TITLE</MovieButton>
-        <MovieButton @click="changeSearchBy('genre')" :is-active="searchBy === 'genre'">GENRE</MovieButton>
+        <MovieButton @click="changeSearchBy('genres')" :is-active="searchBy === 'genres'">GENRE</MovieButton>
       </div>
     </div>
     <div class="sorting-wrap">
       <div class="sorting">
-        <span class="sorting-found">{{sortedAndSearchedMovies.length}} was found</span>
+        <span class="sorting-found">{{searchedMovies.length}} was found</span>
         SORT BY
-        <MovieButton @click="setSortBy('date')" :is-active="sortBy === 'date'">Release Date</MovieButton>
-        <MovieButton @click="setSortBy('duration')" :is-active="sortBy === 'duration'">Duration</MovieButton>
+        <MovieButton @click="changeSortBy('year')" :is-active="sortBy === 'year'">Release Date</MovieButton>
+        <MovieButton @click="changeSortBy('duration')" :is-active="sortBy === 'duration'">Duration</MovieButton>
       </div>
     </div>
-    <MovieList :movieList="sortedAndSearchedMovies" />
+    <div v-if="isLoading" class="loader">
+      <img src="../assets/loader.gif" alt="loader">
+    </div>
+    <MovieList v-else :movieList="searchedMovies" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, computed, ref, watch, onMounted } from 'vue'
 import MovieButton from '../components/MovieButton.vue'
 import MovieList from '../components//MovieList.vue'
-import {mapState, mapGetters, mapActions, mapMutations} from 'vuex'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   name: 'HomeView',
   props: {
-    msg: String
-  },
-  data: function () {
-    return {}
-  },
-  methods: {
-    ...mapMutations({
-      setSearchInput: 'setSearchInput',
-      setSortBy: 'setSortBy',
-      setSearchBy: 'setSearchBy'
-    }),
-    ...mapActions({
-      searchHandle: 'searchHandle'
-    }),
-    changeSearchBy (value: string) {
-      this.setSearchBy(value)
-      this.searchHandle()
+    searchQuery: {
+      type: String,
+      default: '',
     },
+    searchByParam: {
+      type: String,
+      default: 'title',
+    },
+    sortByParam: {
+      type: String,
+      default: 'year',
+    }
   },
-  computed: {
-    ...mapState({
-      searchInput: (state: any) => state.searchInput,
-      sortBy: (state: any) => state.sortBy,
-      searchBy: (state: any) => state.searchBy,
-    }),
-    ...mapGetters({
-      sortedAndSearchedMovies: 'sortedAndSearchedMovies'
+  
+  setup(props) {
+    const store = useStore()
+    const router = useRouter()
+    store.commit('setSearchInput', props.searchQuery)
+    store.commit('setSortBy', props.sortByParam)
+    store.commit('setSearchBy', props.searchByParam)
+    getAllMovies()
+    
+
+    
+
+    const searchInput = computed(() => store.state.searchInput)
+    const sortBy = computed(() => store.state.sortBy)
+    const searchBy = computed(() => store.state.searchBy)
+
+    const searchedMovies = computed(() => {
+      return store.state.searchedMovieList
     })
+
+    const isLoading = computed(() => {
+      return store.state.isLoading
+    })
+
+    const formattedSearchInput = computed({
+      get() {
+        return searchInput.value;
+      },
+      set(value: string) {
+        console.log(value);
+        
+        store.commit('setSearchInput', value)
+        router.push({ query: { ...router.currentRoute.value.query, q: value } })
+      },
+    });
+
+    function changeSortBy(value: string) {
+      store.commit('setSortBy', value)
+      router.push({ query: { ...router.currentRoute.value.query, sortBy: value } });
+      getAllMovies()
+    }
+
+    function changeSearchBy(value: string) {
+      store.commit('setSearchBy', value)
+      router.push({ query: { ...router.currentRoute.value.query, searchBy: value } });
+      getAllMovies()
+    }
+
+    // function handleSearchInput(value: string) {
+    //   // const value = (event.target as HTMLInputElement).value
+    //   store.commit('setSearchInput', value)
+    //   router.push({ query: { ...router.currentRoute.value.query, q: value } });
+    // }
+
+    function getAllMovies() {
+      store.dispatch('getAllMovies')
+    }
+
+    return {
+      searchInput,
+      sortBy,
+      searchBy,
+      searchedMovies,
+      isLoading,
+      changeSortBy,
+      changeSearchBy,
+      getAllMovies,
+      formattedSearchInput
+    }
   },
   components: { MovieList, MovieButton }
 })
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h3 {
   margin: 40px 0 0;
@@ -81,6 +138,17 @@ li {
 }
 a {
   color: #42b983;
+}
+
+.loader {
+  height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loader img {
+  width: 100px;
+  height: 100px;
 }
 
 .sorting-wrap{
