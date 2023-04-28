@@ -3,7 +3,7 @@
     <div class="search-section">
       <h1 class="search-title">FIND YOUR MOVIE</h1>
       <div class="search-wrapper">
-        <input type="text" :value="searchInput" @input="handleSearchInput" @keyup.enter="getAllMovies">
+        <input v-model="formattedSearchInput" @keyup.enter="getAllMovies">
         <MovieButton @click="getAllMovies" :is-search="true">SEARCH</MovieButton>
       </div>
       <div class="searchBy">
@@ -58,9 +58,9 @@ export default defineComponent({
     store.commit('setSortBy', props.sortByParam)
     store.commit('setSearchBy', props.searchByParam)
     getAllMovies()
-    // onMounted(() => {
-      
-    // })
+    
+
+    
 
     const searchInput = computed(() => store.state.searchInput)
     const sortBy = computed(() => store.state.sortBy)
@@ -74,6 +74,18 @@ export default defineComponent({
       return store.state.isLoading
     })
 
+    const formattedSearchInput = computed({
+      get() {
+        return searchInput.value;
+      },
+      set(value: string) {
+        console.log(value);
+        
+        store.commit('setSearchInput', value)
+        router.push({ query: { ...router.currentRoute.value.query, q: value } })
+      },
+    });
+
     function changeSortBy(value: string) {
       store.commit('setSortBy', value)
       router.push({ query: { ...router.currentRoute.value.query, sortBy: value } });
@@ -86,11 +98,11 @@ export default defineComponent({
       getAllMovies()
     }
 
-    function handleSearchInput(event: Event) {
-      const value = (event.target as HTMLInputElement).value
-      store.commit('setSearchInput', value)
-      router.push({ query: { ...router.currentRoute.value.query, q: value } });
-    }
+    // function handleSearchInput(value: string) {
+    //   // const value = (event.target as HTMLInputElement).value
+    //   store.commit('setSearchInput', value)
+    //   router.push({ query: { ...router.currentRoute.value.query, q: value } });
+    // }
 
     function getAllMovies() {
       store.dispatch('getAllMovies')
@@ -104,8 +116,8 @@ export default defineComponent({
       isLoading,
       changeSortBy,
       changeSearchBy,
-      handleSearchInput,
       getAllMovies,
+      formattedSearchInput
     }
   },
   components: { MovieList, MovieButton }
